@@ -125,7 +125,7 @@ def main():
         for invoice_file in invoice_files:
             # Hent fakturanummer
             with col1:
-            st.success(f"Fakturanummer funnet: {invoice_number}")
+                st.success(f"Fakturanummer funnet: {invoice_number}")
                 
             # Ekstraher data fra PDF-filer
             with col1:
