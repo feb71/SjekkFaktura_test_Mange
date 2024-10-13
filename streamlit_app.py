@@ -90,7 +90,6 @@ def convert_df_to_excel(df):
         df.to_excel(writer, index=False, sheet_name='Sheet1')
     return output.getvalue()
 
-# Hovedfunksjon for Streamlit-appen
 def main():
     st.title("Sammenlign Faktura mot Tilbud")
     st.markdown("""<style>.dataframe th {font-weight: bold !important;}</style>""", unsafe_allow_html=True)
@@ -100,10 +99,8 @@ def main():
 
     with col1:
         st.header("Last opp filer")
-        invoice_files = st.file_uploader("Last opp flere fakturaer fra Brødrene Dahl", type="pdf", accept_multiple_files=True)
+        invoice_files = st.file_uploader("Last opp fakturaer fra Brødrene Dahl", type="pdf", accept_multiple_files=True)
         offer_file = st.file_uploader("Last opp tilbud fra Brødrene Dahl (Excel)", type="xlsx")
-
-    all_invoice_data = pd.DataFrame()
 
     if invoice_files and offer_file:
         # Les tilbudet fra Excel-filen
@@ -121,19 +118,26 @@ def main():
             'TOTALPRIS': 'Totalt pris'
         }, inplace=True)
 
-        # Loop over multiple invoices
+        all_invoice_data = pd.DataFrame()  # Samler all fakturadata
+
+        # Løp gjennom alle fakturafiler
         for invoice_file in invoice_files:
             # Hent fakturanummer
             with col1:
-                st.success(f"Fakturanummer funnet: {invoice_number}")
-                
+                invoice_number = get_invoice_number(invoice_file)
+                if invoice_number:
+                    st.success(f"Fakturanummer funnet: {invoice_number}")
+                else:
+                    st.error(f"Kunne ikke finne fakturanummer for {invoice_file.name}")
+                    continue  # Gå til neste faktura hvis ingen fakturanummer ble funnet
+
             # Ekstraher data fra PDF-filer
             with col1:
                 st.info(f"Laster inn faktura: {invoice_file.name}")
-                invoice_data = extract_data_from_pdf(invoice_file, "Faktura", invoice_number)
+            invoice_data = extract_data_from_pdf(invoice_file, "Faktura", invoice_number)
 
-                # Legg til fakturadataene i den totale dataframen
-                all_invoice_data = pd.concat([all_invoice_data, invoice_data], ignore_index=True)
+            # Legg til fakturadataene i den totale dataframen
+            all_invoice_data = pd.concat([all_invoice_data, invoice_data], ignore_index=True)
 
         if not all_invoice_data.empty and not offer_data.empty:
             with col2:
@@ -210,7 +214,7 @@ def main():
             st.error("Kunne ikke lese data fra tilbudet eller fakturaene.")
     else:
         st.error("Last opp både fakturaer og tilbud.")
-        
+
 if __name__ == "__main__":
     main()
 
