@@ -124,12 +124,12 @@ def main():
         # Loop over multiple invoices
         for invoice_file in invoice_files:
             # Hent fakturanummer
-                            with col1:
-                    st.success(f"Fakturanummer funnet: {invoice_number}")
+            with col1:
+            st.success(f"Fakturanummer funnet: {invoice_number}")
                 
-                # Ekstraher data fra PDF-filer
-                with col1:
-                    st.info(f"Laster inn faktura: {invoice_file.name}")
+            # Ekstraher data fra PDF-filer
+            with col1:
+                st.info(f"Laster inn faktura: {invoice_file.name}")
                 invoice_data = extract_data_from_pdf(invoice_file, "Faktura", invoice_number)
 
                 # Legg til fakturadataene i den totale dataframen
